@@ -33,26 +33,28 @@ reader.on('line', function (line) {
 // on end of input sort
 reader.on('close', function () {
   //console.log(orderingRules)
-  //console.log(updates)
 
   updates.forEach(function (update) {
-    var checkRules = [] // hold all incorrect variations that can happen in update
+    var incorrectVariations = [] // hold all incorrect variations that can happen in update
     let allNumbers = update.split(',')
+    //console.log(allNumbers)
     for (let index = 0; index < allNumbers.length - 1; index++) {
       const element = allNumbers[index]
       for (let innerIndex = index + 1; innerIndex < allNumbers.length; innerIndex++) {
         const innerElement = allNumbers[innerIndex]
-        checkRules.push(innerElement + '|' + element)
+        incorrectVariations.push(innerElement + '|' + element)
       }
     }
+
+    //console.log(incorrectVariations)
 
     // compare all incorrect variations with ordering rules, if match then update is incorrect
     var correct = true
     for (let index = 0; index < orderingRules.length; index++) {
       const orderingRule = orderingRules[index]
       if (
-        checkRules.some(function (checkRule) {
-          return checkRule == orderingRule
+        incorrectVariations.some(function (incorrectVariation) {
+          return incorrectVariation == orderingRule
         })
       ) {
         correct = false
@@ -60,8 +62,12 @@ reader.on('close', function () {
       }
     }
     if (correct) {
+      //console.log('correct line')
       result = result + Number(allNumbers[Math.round(allNumbers.length / 2) - 1])
+    } else {
+      //console.log('incorrect line')
     }
+    //console.log('--------')
   })
 
   console.log('result: ' + result)
