@@ -39,6 +39,7 @@ function createFilesAndFreespacesFromInput(line) {
 }
 
 function compactSpace() {
+  // go from end of disc and move all same numbers next to each other (blocks) to free space always from start
   for (let revIndex = disc.length - 1; revIndex > 0; null) {
     const char = disc[revIndex]
     var numberOfCharactersInFiles = 1
@@ -58,55 +59,43 @@ function compactSpace() {
       }
     }
 
-    // check if we can place it from the left, if not continue
+    // check if we can place it from the left, if not continue with next place
     for (let index = 0; index < revIndex; index++) {
       var currentChar = disc[index]
       var countOfEmptySpaces = 0
-      var placed = false
-      if (currentChar != '.') continue
+      var placed = false // for breaking the cycle if we find place to move a block to
+      if (currentChar != '.') continue // cannot place a block to not empty space
       if (currentChar == '.') {
-        countOfEmptySpaces++
-
-        // for one place file only
-        if (numberOfCharactersInFiles == countOfEmptySpaces) {
-          //console.log('we can place ' + files + ' to position ' + (index + 1 - countOfEmptySpaces))
-          // place and break
-          for (let i = 0; i < numberOfCharactersInFiles; i++) {
-            var test = index - i
-            var test2 = revIndex + i + 1
-            disc[test] = char
-            disc[test2] = '.'
-          }
-          placed = true
-        }
+        countOfEmptySpaces++ // found empty space
 
         var isSame = true
         if (!placed) {
           // for multiple places
           while (isSame) {
+            // try to place it to a free space
+            if (numberOfCharactersInFiles == countOfEmptySpaces) {
+              //console.log('we can place ' + files + ' to position ' + (index + 1 - countOfEmptySpaces))
+              // place and break
+              for (let i = 0; i < numberOfCharactersInFiles; i++) {
+                disc[index - i] = char
+                disc[revIndex + i + 1] = '.'
+              }
+              placed = true
+              break
+            }
+
+            // if not placed yet add more space and check if it is empty
             index++
             if (currentChar == disc[index]) {
-              countOfEmptySpaces++
-              if (numberOfCharactersInFiles == countOfEmptySpaces) {
-                //console.log('we can place ' + files + ' to position ' + (index + 1 - countOfEmptySpaces))
-                // place and break
-                for (let i = 0; i < numberOfCharactersInFiles; i++) {
-                  var test = index - i
-                  var test2 = revIndex + i + 1
-                  disc[test] = char
-                  disc[test2] = '.'
-                }
-                placed = true
-                break
-              }
+              countOfEmptySpaces++ // add more space if the same
             } else {
-              isSame = false
+              isSame = false // end loop if not the same
             }
           }
         }
       }
       //console.log(disc.join(''))
-      if (placed) break
+      if (placed) break // if we already placed break a cycle and go to another block, if not placed look for another place
     }
   }
   return disc
@@ -122,5 +111,4 @@ function calculateChecksum() {
   }
 
   return checksum
-  //6321896265143
 }
