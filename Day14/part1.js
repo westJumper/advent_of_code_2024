@@ -28,6 +28,8 @@ reader.on('line', function (line) {
   var xv = Number(line.substring(line.indexOf('v=') + 2, line.lastIndexOf(',')))
   var yv = Number(line.substring(line.lastIndexOf(',') + 1, line.length))
 
+  // if velocity is in minus calculate how many positions from the current it will move if we move to the right in one second
+  // it will end up on a same position after one second if we move with minus velocity (to the left) as if we move with plus velocity (to the right)
   if (xv < 0) xv = xv + width
   if (yv < 0) yv = yv + height
   var xf = (xv * elapsedTime + xi) % width
